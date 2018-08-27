@@ -1,0 +1,16 @@
+{
+    "my_profile": {
+        "description": "My Profile",
+        "server": "my.server.com",
+        "username": "me",
+		"tunnels": [{
+				"route": "55432:localhost:5432",
+				"comment": "PostgreSQL"
+			},
+			{
+				"route": "44443:194.137.84.93:443",
+				"comment": "https"
+			}
+		]
+    }
+}
