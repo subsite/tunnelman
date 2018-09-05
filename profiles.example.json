@@ -12,5 +12,19 @@
 				"comment": "https"
 			}
 		]
-    }
+	},
+    {
+        "name": "My Other Profile",
+        "server": "my.other.com",
+        "username": "me",
+		"tunnels": [{
+				"route": "55433:localhost:3306",
+				"comment": "MySQL"
+			},
+			{
+				"route": "44480:194.137.84.93:443",
+				"comment": "http"
+			}
+		]
+    }	
 ]
