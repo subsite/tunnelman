@@ -8,7 +8,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from lib.ui import MainWindow
+from lib.main_window import MainWindow
 
 #ssh = '/usr/bin/ssh -fnN -o "ServerAliveInterval 60" -o "ServerAliveCountMax 3"'
 
@@ -17,16 +17,18 @@ from lib.ui import MainWindow
 user_config_dir = os.path.expanduser("~") + "/.config/tunnelman"
 profiles_conf = user_config_dir + "/profiles.json"
 
-config = { 'profiles': profiles_conf }
+
 
 with open(profiles_conf, "r", encoding="utf-8") as handle:
     data = handle.read()
     profiles = json.loads(data)
+
+config = { 'profiles': profiles }    
 # /Read config
 
 
 # Check arguments
-if len(sys.argv) < 2:
+"""if len(sys.argv) < 2:
     print("USAGE: tunnels.py [{}]".format('|'.join([p for p in profiles])))
     sys.exit(1)
 
@@ -59,10 +61,10 @@ for t in profile['tunnels']:
 
 print(local_bind_addresses)
 print(remote_bind_addresses)
-
+"""
 
 main_window = MainWindow(config)
-main_window.connect("destroy", Gtk.main_quit)
+main_window.connect("destroy", main_window.main_quit)
 main_window.show_all()
 Gtk.main()
 

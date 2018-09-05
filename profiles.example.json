@@ -1,6 +1,6 @@
-{
-    "my_profile": {
-        "description": "My Profile",
+[
+    {
+        "name": "My Profile",
         "server": "my.server.com",
         "username": "me",
 		"tunnels": [{
@@ -13,4 +13,4 @@
 			}
 		]
     }
-}
+]
