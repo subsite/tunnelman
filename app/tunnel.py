@@ -44,7 +44,8 @@ class Tunnel():
             self.set_status()
             return True
         except Exception as e:
-            self.set_status()
+            self.set_status("Error")
+            print(e)
             return e
 
     def close_tunnel(self):
@@ -60,7 +61,6 @@ class Tunnel():
         #print(self.profile['tunnels'])
         tunnels = []
         for t in self.server.tunnel_is_up:
-            msg="Open"
             tunnelstatus = self.port_index[t[1]]
             tunnelstatus['open'] = self.server.tunnel_is_up[t]
             tunnels.append(tunnelstatus)

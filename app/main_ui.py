@@ -12,7 +12,7 @@ class MainUi(Gtk.Window):
 
     def __init__(self):
 
-        Gtk.Window.__init__(self, title="Tunnelman")
+        Gtk.Window.__init__(self, title="TunnelMan")
         self.set_border_width(10)
 
         hbox = Gtk.Box(spacing=6)
