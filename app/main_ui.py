@@ -1,11 +1,17 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from lib.tunnel import Tunnel
+# gi.require_version('AppIndicator3', '0.1')
+# from gi.repository import AppIndicator3 as appindicator
+from app.tunnel import Tunnel
+from app.config import Config
 
-class MainWindow(Gtk.Window):
+config = Config()
 
-    def __init__(self, config):
+class MainUi(Gtk.Window):
+
+    def __init__(self):
+
         Gtk.Window.__init__(self, title="Tunnelman")
         self.set_border_width(10)
 
@@ -16,7 +22,7 @@ class MainWindow(Gtk.Window):
         listbox.set_selection_mode(Gtk.SelectionMode.NONE)
         hbox.pack_start(listbox, True, True, 0)
 
-        for profile in config['profiles']:
+        for profile in config.conf['profiles']:
             tunnel = Tunnel(profile)
             self.all_tunnels = tunnel._all_tunnels
             row = Gtk.ListBoxRow()

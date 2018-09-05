@@ -1,2 +1,2 @@
 # tunnelman
-SSH Tunnel Manager PyQt
+SSH Tunnel Manager PyGtk3
