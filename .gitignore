@@ -5,4 +5,8 @@ __pycache__/
 profiles.json
 local
 .vscode/
+*.orig
+*.bak
+*.log
+*~
 
