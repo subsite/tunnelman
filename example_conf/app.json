@@ -1,0 +1,5 @@
+{
+    "default_ssh_port": 22,
+    "localhost": "127.0.0.1",
+    "send_keepalive_seconds": 60
+}

@@ -15,15 +15,25 @@ class MainUi(Gtk.Window):
         Gtk.Window.__init__(self, title="TunnelMan")
         self.set_border_width(10)
 
+        self.tunnels = []
+        for profile in config.conf['profiles']:
+            self.tunnels.append(Tunnel(profile))
+        
+        self.tunnel_listbox = None
+
+        self.create_tunnel_listbox()
+
+
+    def create_tunnel_listbox(self):
         hbox = Gtk.Box(spacing=6)
         self.add(hbox)
+        self.tunnel_listbox=Gtk.ListBox()
+        self.tunnel_listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        hbox.pack_start(self.tunnel_listbox, True, True, 0)
+        
 
-        listbox = Gtk.ListBox()
-        listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        hbox.pack_start(listbox, True, True, 0)
-
-        for profile in config.conf['profiles']:
-            tunnel = Tunnel(profile)
+        for t, profile in enumerate(config.conf['profiles']):
+            tunnel = self.tunnels[t]
             self.all_tunnels = tunnel._all_tunnels
             row = Gtk.ListBoxRow()
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
@@ -32,14 +42,17 @@ class MainUi(Gtk.Window):
             label = Gtk.Label(profile['name'], xalign=0)
             hbox.pack_start(label, True, True, 0)
 
+            label_status = Gtk.Label(tunnel.status['message'])
+            hbox.pack_start(label_status, False, True, 0)
+
             #details_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_EDIT))
             #hbox.pack_start(details_btn, False, True, 0)
 
             switch = Gtk.Switch()
-            switch.connect("notify::active", self.on_switch_activated, tunnel)
+            switch.connect("notify::active", self.on_switch_activated, tunnel, label_status)
             hbox.pack_start(switch, False, True, 0)
 
-            listbox.add(row)
+            self.tunnel_listbox.add(row)
     
     def main_quit(self, gparam):
         print("quitting")
@@ -47,7 +60,8 @@ class MainUi(Gtk.Window):
             t.close_tunnel()
         Gtk.main_quit()
 
-    def on_switch_activated(self, switch, gparam, tunnel):
+    def on_switch_activated(self, switch, gparam, tunnel, label_status):
+        
         if switch.get_active():
             print("Opening tunnel {}".format(tunnel.profile['name']))
             tunnel.open_tunnel()
@@ -60,6 +74,7 @@ class MainUi(Gtk.Window):
                 print(self.get_status_all())
             except:
                 print("close failed")
+        label_status.set_text(tunnel.status['message'])
 
     def get_status_all(self):
         for t in self.all_tunnels:
