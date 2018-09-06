@@ -17,54 +17,65 @@ class MainUi(Gtk.Window):
         self.set_border_width(10)
 
         self.tunnels = []
-        for profile in config.conf['profiles']:
-            self.tunnels.append(Tunnel(profile))
+        
         
         self.tunnel_listbox = None
 
-        self.create_tunnel_listbox()
-
-
-    def create_tunnel_listbox(self):
-        hbox = Gtk.Box(spacing=6)
-        self.add(hbox)
+        self.hbox = Gtk.Box(spacing=6)
+        self.add(self.hbox)
         self.tunnel_listbox=Gtk.ListBox()
         self.tunnel_listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        hbox.pack_start(self.tunnel_listbox, True, True, 0)
+        self.hbox.pack_start(self.tunnel_listbox, True, True, 0)
+
+        print(len(config.conf['profiles']))
+        #config = Config()
+        #for profile in config.conf['profiles']:
+            
+
+        hbox = self.hbox
         
-
         for t, profile in enumerate(config.conf['profiles']):
-            tunnel = self.tunnels[t]
-            self.all_tunnels = tunnel._all_tunnels
-            row = Gtk.ListBoxRow()
-            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
-            row.add(hbox)
-
-            label = Gtk.Label(profile['name'], xalign=0)
-            hbox.pack_start(label, True, True, 0)
-
-            label_status = Gtk.Label(tunnel.status['message'])
-            hbox.pack_start(label_status, False, True, 0)
-
-            edit_profile_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_EDIT))
-            edit_profile_btn.connect("clicked", self.on_edit_profile_btn_clicked, t)
-            hbox.pack_start(edit_profile_btn, False, True, 0)
-
-            switch = Gtk.Switch()
-            switch.connect("notify::active", self.on_switch_activated, tunnel, label_status)
-            hbox.pack_start(switch, False, True, 0)
-
-            self.tunnel_listbox.add(row)
-
+            self.add_listbox_row(t)
         # Row for add button
         row = Gtk.ListBoxRow()
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
         row.add(hbox)
         add_profile_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_ADD))
-        add_profile_btn.connect("clicked", self.on_edit_profile_btn_clicked, 0)
+        add_profile_btn.connect("clicked", self.on_edit_profile_btn_clicked, None)
         hbox.pack_start(add_profile_btn, False, True, 0)
         self.tunnel_listbox.add(row)
     
+        self.tunnel_listbox.show_all()            
+
+    def add_listbox_row(self, t):
+        
+        profile = config.conf['profiles'][t]
+        self.tunnels.append(Tunnel(profile))
+        print("tunnel {}".format(t))
+        tunnel = self.tunnels[t]
+        self.all_tunnels = tunnel._all_tunnels
+        row = Gtk.ListBoxRow()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
+        row.add(hbox)
+
+        label = Gtk.Label(profile['name'], xalign=0)
+        hbox.pack_start(label, True, True, 0)
+
+        label_status = Gtk.Label(tunnel.status['message'])
+        hbox.pack_start(label_status, False, True, 0)
+
+        edit_profile_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_EDIT))
+        edit_profile_btn.connect("clicked", self.on_edit_profile_btn_clicked, t)
+        hbox.pack_start(edit_profile_btn, False, True, 0)
+
+        switch = Gtk.Switch()
+        switch.connect("notify::active", self.on_switch_activated, tunnel, label_status)
+        hbox.pack_start(switch, False, True, 0)
+
+        self.tunnel_listbox.add(row)
+        self.tunnel_listbox.show_all()
+
+
     def main_quit(self, gparam):
         print("quitting")
         for t in self.all_tunnels:
@@ -89,11 +100,8 @@ class MainUi(Gtk.Window):
 
     def on_edit_profile_btn_clicked(self, widget, profile_index):
         dialog = EditProfile(self, profile_index)
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            config.save_profile(profile_index)
-            
-        dialog.destroy()
+        print("foo")
+        #dialog.destroy()
 
     def get_status_all(self):
         for t in self.all_tunnels:
