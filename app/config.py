@@ -22,3 +22,6 @@ class Config():
                 self.conf[c['name']] = json.loads(data)
 
         self.conf['base_path'] = base_path
+
+    def save_profile(self, profile):
+        print("Profile saved")

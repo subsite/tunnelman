@@ -5,6 +5,7 @@ from gi.repository import Gtk
 # from gi.repository import AppIndicator3 as appindicator
 from app.tunnel import Tunnel
 from app.config import Config
+from app.edit_ui import EditProfile
 
 config = Config()
 
@@ -45,14 +46,24 @@ class MainUi(Gtk.Window):
             label_status = Gtk.Label(tunnel.status['message'])
             hbox.pack_start(label_status, False, True, 0)
 
-            #details_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_EDIT))
-            #hbox.pack_start(details_btn, False, True, 0)
+            edit_profile_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_EDIT))
+            edit_profile_btn.connect("clicked", self.on_edit_profile_btn_clicked, t)
+            hbox.pack_start(edit_profile_btn, False, True, 0)
 
             switch = Gtk.Switch()
             switch.connect("notify::active", self.on_switch_activated, tunnel, label_status)
             hbox.pack_start(switch, False, True, 0)
 
             self.tunnel_listbox.add(row)
+
+        # Row for add button
+        row = Gtk.ListBoxRow()
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
+        row.add(hbox)
+        add_profile_btn = Gtk.Button(None,image=Gtk.Image(stock=Gtk.STOCK_ADD))
+        add_profile_btn.connect("clicked", self.on_edit_profile_btn_clicked, 0)
+        hbox.pack_start(add_profile_btn, False, True, 0)
+        self.tunnel_listbox.add(row)
     
     def main_quit(self, gparam):
         print("quitting")
@@ -75,6 +86,14 @@ class MainUi(Gtk.Window):
             except:
                 print("close failed")
         label_status.set_text(tunnel.status['message'])
+
+    def on_edit_profile_btn_clicked(self, widget, profile_index):
+        dialog = EditProfile(self, profile_index)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            config.save_profile(profile_index)
+            
+        dialog.destroy()
 
     def get_status_all(self):
         for t in self.all_tunnels:

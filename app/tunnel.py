@@ -5,7 +5,7 @@ from app.config import Config
 
 config = Config()
 
-class Tunnel():
+class Tunnel:
 
     _all_tunnels = []
 
