@@ -1,9 +1,9 @@
 
 
 from sshtunnel import SSHTunnelForwarder
-from app.config import Config 
+from app import util
 
-config = Config()
+config = util.Config()
 
 class Tunnel:
 
@@ -25,7 +25,6 @@ class Tunnel:
         for t in profile['tunnels']:
             self.local_bind_addresses.append((localhost, t['port1']))
             self.remote_bind_addresses.append((t['host'], t['port2']))
-            profile['ssh_port'] = profile.get('ssh_port', self.app_conf['default_ssh_port'])
 
         self.server = None
 
@@ -33,11 +32,11 @@ class Tunnel:
 
         try:
             self.server = SSHTunnelForwarder(
-                (self.profile['server'], self.profile['ssh_port']),
+                (self.profile['server'], self.profile.get('ssh_port', 22)),
                 ssh_username=self.profile['username'],
                 local_bind_addresses=self.local_bind_addresses,
                 remote_bind_addresses=self.remote_bind_addresses,
-                set_keepalive=self.app_conf['send_keepalive_seconds']
+                set_keepalive=self.app_conf.get('send_keepalive_seconds', 0)
             )
         
             self.server.start()

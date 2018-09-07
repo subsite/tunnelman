@@ -2,28 +2,20 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from app.tunnel import Tunnel
-from app.config import Config
+from app import util
 
-config = Config()
+config = util.Config()
 
 class EditProfile(Gtk.Dialog):
     
     def __init__(self, parent, profile_index):
+
         self.parent = parent
         self.profile_index = profile_index
+        
         if self.profile_index is None:
             # New profile
-            self.profile_model = 	{
-                "name": "",
-                "server": "",
-                "username": "",
-                "tunnels": [{
-                    "port1": 0,
-                    "host": "localhost",
-                    "port2": 0,						
-                    "comment": ""
-                }]
-            }
+            self.profile_model = config.default_profile
         else:
             self.profile_model = config.conf['profiles'][profile_index]
 
@@ -43,6 +35,8 @@ class EditProfile(Gtk.Dialog):
         builder.add_from_file("assets/glade/edit_profile.glade")
         builder.connect_signals(handlers)
 
+        self.profile_error = builder.get_object("profile_error")
+
         self.dialog = builder.get_object("edit_dialog")
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
@@ -53,10 +47,17 @@ class EditProfile(Gtk.Dialog):
                 self.fields[fld] = builder.get_object(fld)
                 self.fields[fld].set_text(str(self.profile_model[fld]))
 
+        
+
 
 
     def save_profile(self, button):
-        print("save profile")
+        self.profile_error.set_text("")
+        
+        if self.fields["name"].get_text().strip() == "":
+            self.profile_error.set_text("Profile Name is required.")
+            return
+        
         for fld in self.fields:
             self.profile_model[fld] = self.fields[fld].get_text()
             print(self.fields[fld].get_text())
@@ -64,29 +65,21 @@ class EditProfile(Gtk.Dialog):
             # New profile
             config.conf['profiles'].append(self.profile_model)
             self.profile_index = len(config.conf['profiles'])-1
-            print(self.profile_index)
+            response = Gtk.ResponseType.OK
         else:
             # Update profile
             config.conf['profiles'][self.profile_index] = self.profile_model
+            response = Gtk.ResponseType.APPLY
         
         config.save_profiles_conf()
-        self.parent.add_listbox_row(self.profile_index)
-
-        return True
-        #print(config.conf['profiles'])
-
-        """Gtk.Dialog.__init__(self, profile['name'], parent, 0, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-
-        print(parent)
-
-        self.set_default_size(150, 100)
-
-        label = Gtk.Label("This is a dialog to display additional information")
-
-        box = self.get_content_area()
-        box.add(label)
-        self.show_all()"""
-    def cancel(self, *args):
-        self.dialog.close()
-        print(args)
+        self.dialog.response(response)
         
+        return True
+
+
+    def cancel(self, widget):
+        self.dialog.close()
+        
+
+
+
