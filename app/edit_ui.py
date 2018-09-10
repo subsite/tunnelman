@@ -2,9 +2,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from app.tunnel import Tunnel
-from app import util
+import app.util
 
-config = util.Config()
+utl = app.util.Utl()
 
 class EditProfile(Gtk.Dialog):
     
@@ -15,9 +15,9 @@ class EditProfile(Gtk.Dialog):
         
         if self.profile_index is None:
             # New profile
-            self.profile_model = config.default_profile
+            self.profile_model = utl.conf['default_profile']
         else:
-            self.profile_model = config.conf['profiles'][profile_index]
+            self.profile_model = utl.conf['profiles'][profile_index]
 
         if profile_index == None:
             dialog_title = "Add Profile"
@@ -32,7 +32,7 @@ class EditProfile(Gtk.Dialog):
 
         
         builder = Gtk.Builder()
-        builder.add_from_file("assets/glade/edit_profile.glade")
+        builder.add_from_file(utl.glade_file("edit_profile"))
         builder.connect_signals(handlers)
 
         self.profile_error = builder.get_object("profile_error")
@@ -63,15 +63,15 @@ class EditProfile(Gtk.Dialog):
             print(self.fields[fld].get_text())
         if self.profile_index is None:
             # New profile
-            config.conf['profiles'].append(self.profile_model)
-            self.profile_index = len(config.conf['profiles'])-1
+            utl.conf['profiles'].append(self.profile_model)
+            self.profile_index = len(utl.conf['profiles'])-1
             response = Gtk.ResponseType.OK
         else:
             # Update profile
-            config.conf['profiles'][self.profile_index] = self.profile_model
+            utl.conf['profiles'][self.profile_index] = self.profile_model
             response = Gtk.ResponseType.APPLY
         
-        config.save_profiles_conf()
+        utl.save_profiles_conf()
         self.dialog.response(response)
         
         return True
