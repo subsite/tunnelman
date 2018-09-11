@@ -1,6 +1,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository.GdkPixbuf import Pixbuf
 from app.tunnel import Tunnel
 import app.util
 
@@ -48,27 +49,27 @@ class EditProfile(Gtk.Dialog):
                 self.fields[fld].set_text(str(self.profile_model[fld]))
 
 
-        tunnels_store = Gtk.ListStore(int, str, int, str)
-        tunnels_container = builder.get_object("tunnels_list")
+        # Tunnels list
+        tunnels_store = Gtk.ListStore(int, str, int, str, str, str)
         self.tunnels_list = Gtk.TreeView(tunnels_store)
 
-        renderer = Gtk.CellRendererText()
-        for i, column_title in enumerate(["Port1", "Host", "Port2", "Comment"]):
-            column = Gtk.TreeViewColumn(column_title, renderer, text=i)
-            self.tunnels_list.append_column(column)
-
-        
-        for i, column_title in enumerate(["STOCK_EDIT", "Delete"]):
-            renderer = Gtk.CellRendererPixbuf()
-            column = Gtk.TreeViewColumn(column_title, renderer, gicon=Gtk.STOCK_EDIT)
-            self.tunnels_list.append_column(column)
-
         for t in self.profile_model['tunnels']:
-            treeiter = tunnels_store.append([t['port1'], t['host'], t['port2'], t['comment']])
+            treeiter = tunnels_store.append([t['port1'], t['host'], t['port2'], t['comment'], Gtk.STOCK_EDIT, Gtk.STOCK_DELETE])
 
+        # Create columns
+        renderer = Gtk.CellRendererText()
+        renderer_pixbuf = Gtk.CellRendererPixbuf()
+        for i, column_title in enumerate(["Port1", "Host", "Port2", "Comment", "Edit", "Delete"]):
+            if i < 4:
+                column = Gtk.TreeViewColumn(column_title, renderer, text=i)
+            else:
+                column = Gtk.TreeViewColumn(column_title, renderer_pixbuf, icon_name=i)
+            if column_title == "Comment":
+                column.set_expand(True)
+            self.tunnels_list.append_column(column)
 
-                
-        
+        # Add listview to container
+        tunnels_container = builder.get_object("tunnels_list")
         tunnels_container.add(self.tunnels_list)
         
         self.dialog.show_all()
@@ -99,10 +100,9 @@ class EditProfile(Gtk.Dialog):
         
         return True
 
+    def on_edit_tunnel(self, widget):
+        print("click")
 
     def cancel(self, widget):
         self.dialog.close()
         
-
-
-
