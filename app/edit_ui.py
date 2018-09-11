@@ -39,7 +39,7 @@ class EditProfile(Gtk.Dialog):
 
         self.dialog = builder.get_object("edit_dialog")
         self.dialog.set_transient_for(parent)
-        self.dialog.show_all()
+        
 
         self.fields = {}
         for fld in self.profile_model:
@@ -47,8 +47,31 @@ class EditProfile(Gtk.Dialog):
                 self.fields[fld] = builder.get_object(fld)
                 self.fields[fld].set_text(str(self.profile_model[fld]))
 
-        
 
+        tunnels_store = Gtk.ListStore(int, str, int, str)
+        tunnels_container = builder.get_object("tunnels_list")
+        self.tunnels_list = Gtk.TreeView(tunnels_store)
+
+        renderer = Gtk.CellRendererText()
+        for i, column_title in enumerate(["Port1", "Host", "Port2", "Comment"]):
+            column = Gtk.TreeViewColumn(column_title, renderer, text=i)
+            self.tunnels_list.append_column(column)
+
+        
+        for i, column_title in enumerate(["STOCK_EDIT", "Delete"]):
+            renderer = Gtk.CellRendererPixbuf()
+            column = Gtk.TreeViewColumn(column_title, renderer, gicon=Gtk.STOCK_EDIT)
+            self.tunnels_list.append_column(column)
+
+        for t in self.profile_model['tunnels']:
+            treeiter = tunnels_store.append([t['port1'], t['host'], t['port2'], t['comment']])
+
+
+                
+        
+        tunnels_container.add(self.tunnels_list)
+        
+        self.dialog.show_all()
 
 
     def save_profile(self, button):

@@ -53,7 +53,7 @@ class MainUi(Gtk.Window):
             tunnel = self.tunnels[profile['id']]
             #self.all_tunnels = tunnel._all_tunnels
             row = Gtk.ListBoxRow()
-            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=50)
+            hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
             row.add(hbox)
 
             label = Gtk.Label(profile['name'], xalign=0)
