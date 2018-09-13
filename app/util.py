@@ -37,12 +37,14 @@ class Utl():
             "username": "",
             "ssh_port": 22,
             "send_keepalive_seconds": 60,
-            "tunnels": [{
-                "port1": 0,
-                "host": "localhost",
-                "port2": 0,						
-                "comment": ""
-            }]
+            "tunnels": []
+        }
+
+        self.conf['default_tunnel'] = {
+            "port1": 0,
+            "host": "",
+            "port2": 0,						
+            "comment": "New tunnel"
         }
  
     def create_id(self, size=16, chars=string.ascii_lowercase + string.digits):
@@ -67,6 +69,11 @@ class Utl():
         """Return parsed glade file with absolute path"""
         return "{}/assets/glade/{}.glade".format(self.conf['base_path'], file_ident)
 
+    def is_valid_tunnel(self, tunnel):
+        if tunnel['port1'] > 0 and tunnel['port2'] > 0 and tunnel['host'].strip() != "":
+            return True
+        else:
+            return False
 
 utl = Utl()
 
