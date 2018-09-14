@@ -1,6 +1,7 @@
 
 import os
 from pathlib import Path
+from shutil import copyfile
 import json
 import string, random
 
@@ -17,18 +18,22 @@ class Utl():
 
         base_path = os.path.join( os.path.dirname(os.path.realpath(__file__)) , os.path.pardir)
         user_config_dir = "{}/.config/tunnelman".format(os.path.expanduser("~"))
+        self.conf['base_path'] = base_path
         
         self.confs = [
             {'name': "profiles", 'file':  "{}/profiles.json".format(user_config_dir)},
             {'name': "app", 'file':  "{}/app.json".format(user_config_dir) }
-        ]
+        ]        
+        self.load_conf()
+
+    
+    def load_conf(self):
+
 
         for c in self.confs:
             with open(c['file'], "r", encoding="utf-8") as handle:
                 data = handle.read()
                 self.conf[c['name']] = json.loads(data)
-
-        self.conf['base_path'] = base_path    
 
         self.conf['default_profile'] = {
             "id": self.create_id(),
@@ -61,8 +66,13 @@ class Utl():
 
     def save_profiles_conf(self):
         """Save profiles conf from memory to file"""
+        # copy current conf to .bak
+        copyfile(self.confs[0]['file'], "{}.bak".format(self.confs[0]['file']))
+        # Write new conf file
         with open(self.confs[0]['file'], 'w') as outfile:
             json.dump(self.conf['profiles'], outfile, indent=4)
+        # Overwrite memory with new conf
+        self.load_conf()            
         print("Profile saved")
 
     def glade_file(self, file_ident):

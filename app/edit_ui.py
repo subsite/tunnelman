@@ -21,7 +21,11 @@ class EditProfile(Gtk.Dialog):
             # New profile
             self.profile_model = utl.conf['default_profile']
         else:
-            self.profile_model = utl.conf['profiles'][profile_index]
+            self.profile_model = copy.deepcopy(utl.conf['profiles'][profile_index])
+
+            print("INIT EditProfile {}".format(self.profile_index))
+
+        self.original_model = copy.deepcopy(self.profile_model)
 
         if profile_index == None:
             dialog_title = "Add Profile"
@@ -31,10 +35,10 @@ class EditProfile(Gtk.Dialog):
 
         handlers = {
             "onSaveProfile": self.save_profile,
-            "onCancel":  self.cancel
+            "onCancel":  self.cancel,
+            "onDelTunnel": self.on_del_tunnel
         }
 
-        
         builder = Gtk.Builder()
         builder.add_from_file(utl.glade_file("edit_profile"))
         builder.connect_signals(handlers)
@@ -56,15 +60,22 @@ class EditProfile(Gtk.Dialog):
         self.tunnel_keys = ["port1", "host", "port2", "comment"]
         self.tunnels_store = Gtk.ListStore(int, str, int, str, str)
         self.tunnels_list = Gtk.TreeView(self.tunnels_store)
-
-
+        self.selected_tunnel = self.tunnels_list.get_selection()
+        self.selected_tunnel.connect("changed", self.on_select_tunnel)
+        self.del_button = builder.get_object("delete_tunnel")
+        self.save_button = builder.get_object("save_profile")
+    
         self.profile_model['tunnels'].append(utl.conf['default_tunnel'])
+
+
         for t in self.profile_model['tunnels']:
             tlist = [t[key] for key in self.tunnel_keys]
-            tlist.append("green")
-            self.treeiter = self.tunnels_store.append(tlist)
-
-        print(self.tunnels_store)
+            # Add key for color
+            tlist.append("#222222")
+            self.tunnels_store.append(tlist)
+        
+        # Set color of default tunnel
+        self.tunnels_store[-1][4] = "gray"
 
         # Create columns
         
@@ -73,9 +84,10 @@ class EditProfile(Gtk.Dialog):
             renderer = Gtk.CellRendererText()
             renderer.set_property("editable", True)
             
-        
-            renderer.connect("edited", self.on_edit_tunnel, i)
-            column = Gtk.TreeViewColumn(column_title, renderer, text=i)
+            renderer.connect("editing-started", self.on_edit_tunnel_start, i)
+            renderer.connect("editing-canceled", self.on_edit_tunnel_cancel)
+            renderer.connect("edited", self.on_edit_tunnel_finish, i)
+            column = Gtk.TreeViewColumn(column_title, renderer, text=i, foreground=4)
             if column_title == "Comment":
                 column.set_expand(True)
             self.tunnels_list.append_column(column)
@@ -84,13 +96,7 @@ class EditProfile(Gtk.Dialog):
         tunnels_container = builder.get_object("tunnels_list")
         tunnels_container.add(self.tunnels_list)
 
-        print(self.tunnels_list)
-        
         self.dialog.show_all()
-
-
-        print(json.dumps(self.profile_model['tunnels']))
-
 
     def save_profile(self, button):
         self.profile_error.set_text("")
@@ -98,9 +104,6 @@ class EditProfile(Gtk.Dialog):
         if self.fields["name"].get_text().strip() == "":
             self.profile_error.set_text("Profile Name is required.")
             return
-
-        print([t for t in self.profile_model['tunnels'] if utl.is_valid_tunnel(t)])
-        
 
         for fld in self.fields:
             self.profile_model[fld] = self.fields[fld].get_text()
@@ -122,11 +125,16 @@ class EditProfile(Gtk.Dialog):
         
         return True
 
-    def on_edit_tunnel(self, widget, path, text, i):
+    def on_edit_tunnel_start(self, widget, path, text, i):
+        # Deactivate save button until editing finished
+        self.save_button.set_sensitive(False)
 
-        widget.set_property("foreground", "red")
-        print("{}: {} => {} type: {}".format(path, self.tunnels_store[path][i], text, type(self.tunnels_store[path][i])))
-        
+    def on_edit_tunnel_cancel(self, widget):
+        # Deactivate save button until editing finished
+        self.save_button.set_sensitive(True)        
+
+    def on_edit_tunnel_finish(self, widget, path, text, i):
+        self.save_button.set_sensitive(True)
         if type(self.tunnels_store[path][i]) is str:
             newval = text
         elif type(self.tunnels_store[path][i]) is int:
@@ -139,14 +147,22 @@ class EditProfile(Gtk.Dialog):
 
         # Check valid
         if utl.is_valid_tunnel(updated_tunnel):
-            print("valid")
-            
-            #print(json.dumps(self.profile_model['tunnels'][int(path)]))
+            self.tunnels_store[path][4] = "green"
         else:
-            print("invalid tunnel")
-        
-        
-    
+            self.tunnels_store[path][4] = "red"
+
+    def on_select_tunnel(self, selection):
+        self.del_button.set_sensitive(True)
+
+    def on_del_tunnel(self, button):
+        (model, paths) = self.selected_tunnel.get_selected_rows()
+        index = paths[0].get_indices()[0]
+        iter = model.get_iter(paths[0])
+        del self.profile_model['tunnels'][index]
+        model.remove(iter)
+
     def cancel(self, widget):
+        self.profile_model = copy.deepcopy(self.original_model)
         self.dialog.close()
+        
         
