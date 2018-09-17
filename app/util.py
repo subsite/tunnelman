@@ -29,12 +29,6 @@ class Utl():
     
     def load_conf(self):
 
-
-        for c in self.confs:
-            with open(c['file'], "r", encoding="utf-8") as handle:
-                data = handle.read()
-                self.conf[c['name']] = json.loads(data)
-
         self.conf['default_profile'] = {
             "id": self.create_id(),
             "name": "",
@@ -51,6 +45,29 @@ class Utl():
             "port2": 0,						
             "comment": "New tunnel"
         }
+
+        self.conf['default_app'] = {
+            "default_ssh_port": 22,
+            "localhost": "127.0.0.1",
+            "send_keepalive_seconds": 60
+        }
+
+        for c in self.confs:
+            if os.path.exists(c['file']):
+                with open(c['file'], "r", encoding="utf-8") as handle:
+                    data = handle.read()
+                    self.conf[c['name']] = json.loads(data)
+            elif c['name'] == "app":
+                # First run, write default app conf if not exists
+                self.conf[c['name']] = self.conf['default_app']
+                with open(c['file'], 'w') as outfile:
+                    json.dump(self.conf['app'], outfile, indent=4)
+            else:
+                # First run, empty profiles conf
+                self.conf[c['name']] = []
+                
+
+
  
     def create_id(self, size=16, chars=string.ascii_lowercase + string.digits):
         """Create random string to use as tunnel id"""
@@ -67,7 +84,9 @@ class Utl():
     def save_profiles_conf(self):
         """Save profiles conf from memory to file"""
         # copy current conf to .bak
-        copyfile(self.confs[0]['file'], "{}.bak".format(self.confs[0]['file']))
+        if os.path.exists(self.confs[0]['file']):
+            copyfile(self.confs[0]['file'], "{}.bak".format(self.confs[0]['file']))
+        
         # Write new conf file
         with open(self.confs[0]['file'], 'w') as outfile:
             json.dump(self.conf['profiles'], outfile, indent=4)
