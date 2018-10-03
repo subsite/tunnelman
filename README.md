@@ -6,6 +6,11 @@ SSH Tunnel Manager written Python GTK+ 3
 - Manage local tunnels with multiple port forwards, equivalent to `ssh host.com -L 8080:localhost:80 -L 55432:192.168.2.2:5432`
 - Uses sshtunnel (SSHTunnelForwarder) library for ssh stuff: https://pypi.org/project/sshtunnel/
 
+### Screenshots
+![Main Window](https://subsite.github.io/tunnelman/screenshots/main_window.png)
+
+![Edit Profile](https://subsite.github.io/tunnelman/screenshots/profile_window.png)
+
 
 ### Setup
 
@@ -34,15 +39,9 @@ Features to implement:
 
 Please report any bugs to the issue tracker. 
 
-### Example
 
-Main window:
 
-![Main Window](https://subsite.github.io/tunnelman/screenshots/main_window.png)
 
-Edit profile:
-
-![Edit Profile](https://subsite.github.io/tunnelman/screenshots/profile_window.png)
 
 
 
