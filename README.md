@@ -14,9 +14,9 @@ SSH Tunnel Manager written Python GTK+ 3
 
 ### Setup
 
-No automatic install yet, so you have to do it manually. This is tested on Ubuntu 18.04, but should work on other Linux variants that support GTK+ 3.
+This is tested on Ubuntu 18.04, but should work on other Linux variants that support GTK+ 3.
 
-Also note that it doesn't have a password prompt yet, so you need to have key-auyhentication set up for all hosts.
+Note that it doesn't have password prompts yet, so you'll need to have key-auyhentication set up for all hosts. 
 
 - Install python3 packages `sudo apt install python3 python3-pip python3-gi`
 - Install additional packages `pip3 install sshtunnel`
