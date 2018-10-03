@@ -1,5 +1,5 @@
 
-import os
+import sys, os
 from pathlib import Path
 from shutil import copyfile
 import json
@@ -13,16 +13,33 @@ from gi.repository import Gtk
 class Utl():
 
     conf = {}
+    _args = {}
+
+    # read command line arguments
+    for arg in sys.argv[1:]:
+        try:
+            _args[arg.split("=")[0]] = arg.split("=")[1]
+        except:
+            print("Bad argument {}".format(arg))
 
     def __init__(self):
 
         base_path = os.path.join( os.path.dirname(os.path.realpath(__file__)) , os.path.pardir)
-        user_config_dir = "{}/.config/tunnelman".format(os.path.expanduser("~"))
-        self.conf['base_path'] = base_path
         
+        self.conf['base_path'] = base_path
+
+        # Assign run time config_dir from argument confdir=/path/to/conf for testing purposes
+        if 'confdir' in self._args:
+            self.config_dir = self._args['confdir']
+        else:
+            self.config_dir = "{}/.config/tunnelman".format(os.path.expanduser("~"))
+        
+        # create conf path if not exists
+        Path(self.config_dir).mkdir(parents=True, exist_ok=True)
+
         self.confs = [
-            {'name': "profiles", 'file':  "{}/profiles.json".format(user_config_dir)},
-            {'name': "app", 'file':  "{}/app.json".format(user_config_dir) }
+            {'name': "profiles", 'file':  "{}/profiles.json".format(self.config_dir)},
+            {'name': "app", 'file':  "{}/app.json".format(self.config_dir) }
         ]        
         self.load_conf()
 
