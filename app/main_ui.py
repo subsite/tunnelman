@@ -2,7 +2,7 @@
 import threading
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 
 from app.tunnel import Tunnel, HostKeyError
 from app.edit_ui import EditProfile
@@ -50,6 +50,12 @@ class MainUi(Gtk.Window):
         add_btn.connect("clicked", self.on_add_profile_btn_clicked)
         add_btn.get_style_context().add_class("suggested-action")
         hb.pack_end(add_btn)
+
+        about_btn = Gtk.Button.new_from_icon_name("help-about-symbolic", Gtk.IconSize.BUTTON)
+        about_btn.set_tooltip_text("About TunnelMan")
+        about_btn.connect("clicked", self.on_about_clicked)
+        about_btn.get_style_context().add_class("flat")
+        hb.pack_start(about_btn)
 
         self.window.set_titlebar(hb)
 
@@ -206,6 +212,27 @@ class MainUi(Gtk.Window):
             text="Failed to open tunnel",
         )
         dialog.format_secondary_text(message)
+        dialog.run()
+        dialog.destroy()
+
+    def on_about_clicked(self, widget):
+        dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)
+        dialog.set_program_name("TunnelMan")
+        dialog.set_version("1.0")
+        dialog.set_authors(["Fredrik Welander"])
+        dialog.set_website("https://github.com/subsite/tunnelman")
+        dialog.set_website_label("github.com/subsite/tunnelman")
+        dialog.set_comments("SSH tunnel manager")
+        dialog.set_license_type(Gtk.License.GPL_3_0)
+        dialog.set_logo_icon_name(None)
+        try:
+            dialog.set_logo(
+                GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                    "{}/assets/img/icon.png".format(utl.conf['base_path']), 64, 64, True
+                )
+            )
+        except Exception:
+            pass
         dialog.run()
         dialog.destroy()
 

@@ -32,7 +32,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="confirm_btn">
                 <property name="label">Delete</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>

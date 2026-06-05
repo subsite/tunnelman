@@ -6,7 +6,7 @@ window {
 /* List background */
 .profile-list {
     background-color: #f0f0f0;
-    padding: 8px;
+    padding: 4px 8px;
 }
 
 /* Row cards */
@@ -31,8 +31,8 @@ window {
 
 /* Row content */
 .profile-row {
-    padding: 10px 14px;
-    min-height: 44px;
+    padding: 6px 14px;
+    min-height: 36px;
 }
 
 .profile-name {

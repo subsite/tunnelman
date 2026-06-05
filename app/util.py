@@ -111,6 +111,14 @@ class ConfirmDelete(Gtk.Dialog):
 
         self.dialog = builder.get_object("confirm_delete")
         self.dialog.set_transient_for(parent)
+
+        hb = Gtk.HeaderBar()
+        hb.set_show_close_button(False)
+        hb.set_title("Delete Profile")
+        self.dialog.set_titlebar(hb)
+
+        builder.get_object("confirm_btn").get_style_context().add_class("destructive-action")
+
         self.dialog.show_all()
 
     def respond(self, widget, response):
