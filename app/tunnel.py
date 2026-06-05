@@ -1,78 +1,98 @@
 
+import subprocess
+import time
+from app.util import utl
 
-from sshtunnel import SSHTunnelForwarder
-import app.util
 
-utl = app.util.Utl()
+class HostKeyError(Exception):
+    """SSH encountered an unknown host key."""
+    pass
 
 
 class Tunnel:
 
-    profile_id = ""
-
     def __init__(self, profile):
-        #Tunnel._all_tunnels.append(self)
         self.profile_id = profile["id"]
         self.profile = profile
         self.app_conf = utl.conf['app']
-        self.status = { 'message': "Closed", 'tunnels': {} }
+        self.status = {'message': "Closed"}
         self.is_open = False
-        # index profile tunnels by port1
-        self.port_index = utl.list_to_dict_by_key(profile['tunnels'], "port1")
-        localhost = self.app_conf['localhost']
-        self.local_bind_addresses = []
-        self.remote_bind_addresses = []
+        self._process = None
 
-        #print(profile)
+    def _build_cmd(self, trust_new_host=False):
+        cmd = [
+            'ssh', '-N',
+            '-o', 'BatchMode=yes',
+            '-o', 'ExitOnForwardFailure=yes',
+        ]
+        if trust_new_host:
+            cmd += ['-o', 'StrictHostKeyChecking=accept-new']
+        keepalive = self.profile.get(
+            'send_keepalive_seconds',
+            self.app_conf.get('send_keepalive_seconds', 0)
+        )
+        if keepalive:
+            cmd += ['-o', f'ServerAliveInterval={int(keepalive)}',
+                    '-o', 'ServerAliveCountMax=3']
 
-        for t in profile['tunnels']:
-            self.local_bind_addresses.append((localhost, t['port1']))
-            self.remote_bind_addresses.append((t['host'], t['port2']))
+        ssh_port = int(self.profile.get('ssh_port', 22))
+        if ssh_port != 22:
+            cmd += ['-p', str(ssh_port)]
 
-        self.server = None
+        localhost = self.app_conf.get('localhost', '127.0.0.1')
+        for t in self.profile['tunnels']:
+            cmd += ['-L', f"{localhost}:{t['port1']}:{t['host']}:{t['port2']}"]
 
-    def open_tunnel(self):
+        cmd.append(f"{self.profile['username']}@{self.profile['server']}")
+        return cmd
 
+    def open_tunnel(self, trust_new_host=False):
+        utl.log(f"[{self.profile['name']}] Connecting to {self.profile['server']}...")
         try:
-            self.server = SSHTunnelForwarder(
-                (self.profile['server'], int(self.profile.get('ssh_port', 22))),
-                ssh_username=self.profile['username'],
-                local_bind_addresses=self.local_bind_addresses,
-                remote_bind_addresses=self.remote_bind_addresses,
-                set_keepalive=self.app_conf.get('send_keepalive_seconds', 0)
+            self._process = subprocess.Popen(
+                self._build_cmd(trust_new_host),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                text=True
             )
-        
-            self.server.start()
-            self.set_status("Open")
+            # Wait briefly: ExitOnForwardFailure means ssh exits fast on failure,
+            # and stays running on success.
+            time.sleep(2)
+            rc = self._process.poll()
+            if rc is not None:
+                stderr = self._process.stderr.read().strip()
+                self._process = None
+                self.status = {'message': "Error"}
+                self.is_open = False
+                print(f"[{self.profile['name']}] {stderr or f'ssh exited with code {rc}'}")
+                if 'Host key verification failed' in stderr:
+                    return HostKeyError(stderr)
+                return Exception(stderr or f"ssh exited with code {rc}")
+            forwards = ', '.join(
+                f"{t['port1']} → {t['host']}:{t['port2']}"
+                for t in self.profile['tunnels']
+            )
+            utl.log(f"[{self.profile['name']}] Open ({forwards})")
+            self.status = {'message': "Open"}
             self.is_open = True
             return True
         except Exception as e:
-            self.set_status("Error")
+            if self._process:
+                self._process.kill()
+                self._process = None
+            self.status = {'message': "Error"}
             self.is_open = False
-            print(e)
+            print(f"[{self.profile['name']}] {e}")
             return e
 
     def close_tunnel(self):
-        if self.server:
-            self.server.stop()
-            self.set_status("Closed")
-            self.is_open = False
-            print("Closed tunnel {}".format(self.profile['name']))
-        else:
-            print("Can't close {}, Tunnel not open".format(self.profile['name']))
-    
-    def set_status(self, msg="Unknown"):
-        #print(self.profile['tunnels'])
-        tunnels = []
-        
-        for t in self.server.tunnel_is_up:
-            tunnelstatus = self.port_index[t[1]]
-            tunnelstatus['open'] = self.server.tunnel_is_up[t]
-            tunnels.append(tunnelstatus)
-            #print("port:{}, open:{}".format(t))
-        self.status = { 'message': msg, 'tunnels':  tunnels }
-        return True
-
-    
-    
-
+        if self._process:
+            self._process.terminate()
+            try:
+                self._process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                self._process.kill()
+            self._process = None
+        utl.log(f"[{self.profile['name']}] Closed")
+        self.status = {'message': "Closed"}
+        self.is_open = False

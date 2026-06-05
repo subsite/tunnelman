@@ -1,0 +1,4 @@
+# No pip dependencies.
+# System dependencies:
+#   sudo apt install python3-gi openssh-client   (Debian/Ubuntu)
+#   sudo dnf install python3-gobject openssh     (Fedora/RHEL)

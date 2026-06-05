@@ -19,11 +19,10 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton">
-                <property name="label">gtk-cancel</property>
+                <property name="label">Cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
                 <signal name="clicked" handler="onCancel" swapped="no"/>
               </object>
               <packing>
@@ -34,12 +33,10 @@
             </child>
             <child>
               <object class="GtkButton">
-                <property name="label">gtk-delete</property>
+                <property name="label">Delete</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <property name="always_show_image">True</property>
                 <signal name="clicked" handler="onConfirm" swapped="no"/>
               </object>
               <packing>

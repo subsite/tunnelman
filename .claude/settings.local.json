@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import gi\")",
+      "Bash(pip3 show *)",
+      "Bash(apt-cache show *)",
+      "Bash(dpkg -l python3-gi)",
+      "Bash(python3 *)",
+      "Bash(venv/bin/pip show *)",
+      "Bash(./venv/bin/pip show *)",
+      "Bash(pip show *)",
+      "Read(//usr/**)"
+    ]
+  }
+}

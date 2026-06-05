@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkDialog" id="edit_dialog">
     <property name="can_focus">False</property>
+    <property name="default_width">520</property>
+    <property name="default_height">480</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <child>
@@ -12,58 +13,56 @@
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can_focus">False</property>
-        <property name="margin_left">5</property>
-        <property name="margin_right">5</property>
-        <property name="margin_top">5</property>
-        <property name="margin_bottom">5</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
+        <property name="spacing">0</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can_focus">False</property>
+            <property name="margin_left">12</property>
+            <property name="margin_right">12</property>
+            <property name="margin_top">8</property>
+            <property name="margin_bottom">8</property>
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="delete_tunnel">
-                <property name="label">gtk-delete</property>
+                <property name="label">Delete Tunnel</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
                 <signal name="clicked" handler="onDelTunnel" swapped="no"/>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
+                <property name="secondary">True</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton">
-                <property name="label">gtk-cancel</property>
+                <property name="label">Cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
                 <signal name="clicked" handler="onCancel" swapped="no"/>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton" id="save_profile">
-                <property name="label">gtk-save</property>
+                <property name="label">Save</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
                 <signal name="clicked" handler="onSaveProfile" swapped="no"/>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
@@ -76,151 +75,204 @@
           </packing>
         </child>
         <child>
-          <object class="GtkGrid">
+          <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <property name="margin_left">16</property>
+            <property name="margin_right">16</property>
+            <property name="margin_top">14</property>
+            <property name="margin_bottom">8</property>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Profile Name</property>
+                <property name="label">CONNECTION</property>
+                <property name="xalign">0</property>
+                <style>
+                  <class name="section-title"/>
+                </style>
               </object>
               <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkGrid" id="form_grid">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="row_spacing">8</property>
+                <property name="column_spacing">10</property>
+                <style>
+                  <class name="form-grid"/>
+                </style>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label">Profile Name</property>
+                    <property name="xalign">1</property>
+                    <style><class name="form-label"/></style>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="name">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hexpand">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label">Server</property>
+                    <property name="xalign">1</property>
+                    <style><class name="form-label"/></style>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="server">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hexpand">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label">SSH Port</property>
+                    <property name="xalign">1</property>
+                    <style><class name="form-label"/></style>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="ssh_port">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="width_chars">6</property>
+                    <property name="input_purpose">number</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label">Username</property>
+                    <property name="xalign">1</property>
+                    <style><class name="form-label"/></style>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="username">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Server</property>
+                <property name="label">PORT FORWARDS</property>
+                <property name="xalign">0</property>
+                <property name="margin_top">8</property>
+                <style>
+                  <class name="section-title"/>
+                </style>
               </object>
               <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">1</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">SSH Port</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">User Name</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="name">
+              <object class="GtkScrolledWindow" id="tunnels_list">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="hscrollbar_policy">never</property>
+                <property name="vscrollbar_policy">automatic</property>
+                <property name="min_content_height">130</property>
+                <style>
+                  <class name="tunnel-list-scroll"/>
+                </style>
+                <child>
+                  <placeholder/>
+                </child>
               </object>
               <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">0</property>
-                <property name="width">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="server">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="username">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="input_purpose">number</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="ssh_port">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="input_purpose">number</property>
-              </object>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="top_attach">1</property>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="profile_error">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <attributes>
-                  <attribute name="foreground" value="#efef29292929"/>
-                </attributes>
+                <property name="xalign">0</property>
+                <style>
+                  <class name="error-label"/>
+                </style>
               </object>
               <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">3</property>
-                <property name="width">4</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
         </child>
-        <child type="center">
-          <object class="GtkBox" id="tunnels_list">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
       </object>
     </child>
-  </object>
-  <object class="GtkListStore" id="tunnels_store">
-    <columns>
-      <!-- column-name Port1 -->
-      <column type="gint"/>
-      <!-- column-name Address -->
-      <column type="gchar"/>
-      <!-- column-name Port2 -->
-      <column type="gint"/>
-      <!-- column-name Comment -->
-      <column type="gchar"/>
-    </columns>
   </object>
 </interface>

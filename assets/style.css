@@ -1,0 +1,138 @@
+/* Window */
+window {
+    background-color: #f0f0f0;
+}
+
+/* List background */
+.profile-list {
+    background-color: #f0f0f0;
+    padding: 8px;
+}
+
+/* Row cards */
+.profile-list row {
+    background-color: white;
+    border-radius: 8px;
+    margin: 3px 0;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.profile-list row:hover {
+    background-color: #fdfdfd;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.10);
+}
+
+/* Disable selection highlight */
+.profile-list row:selected {
+    background-color: white;
+    color: inherit;
+}
+
+/* Row content */
+.profile-row {
+    padding: 10px 14px;
+    min-height: 44px;
+}
+
+.profile-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+/* Status dot */
+.status-dot {
+    font-size: 12px;
+    margin-right: 4px;
+    min-width: 16px;
+}
+.status-closed     { color: #c8c8c8; }
+.status-open       { color: #43a047; }
+.status-error      { color: #e53935; }
+.status-connecting { color: #fb8c00; }
+
+/* Flat action buttons */
+.profile-list button.flat {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 4px;
+    border-radius: 6px;
+    color: #757575;
+    margin: 0 1px;
+}
+
+.profile-list button.flat:hover {
+    background-color: rgba(0,0,0,0.07);
+    color: #424242;
+}
+
+/* Add button in header */
+headerbar button.suggested-action {
+    border-radius: 6px;
+    padding: 4px 10px;
+}
+
+/* ── Edit dialog ─────────────────────────────── */
+
+.section-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #999999;
+    letter-spacing: 1px;
+}
+
+.form-label {
+    color: #555555;
+    font-size: 13px;
+    min-width: 80px;
+}
+
+/* Tunnel TreeView wrapper */
+.tunnel-list-scroll {
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 6px;
+    background-color: white;
+}
+
+/* TreeView column headers */
+.tunnel-list-scroll treeview header button {
+    background-color: #f5f5f5;
+    background-image: none;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    border-radius: 0;
+    font-weight: 600;
+    font-size: 12px;
+    color: #666666;
+    padding: 5px 8px;
+    box-shadow: none;
+}
+
+.tunnel-list-scroll treeview {
+    background-color: white;
+    font-size: 13px;
+}
+
+.tunnel-list-scroll treeview:selected {
+    background-color: #e8f0fe;
+    color: #1a1a1a;
+}
+
+/* Inline error message */
+.error-label {
+    color: #c62828;
+    font-size: 12px;
+    min-height: 16px;
+}
+
+/* Action buttons */
+dialog button.suggested-action {
+    border-radius: 6px;
+    padding: 5px 16px;
+    font-weight: 600;
+}
+
+dialog button.destructive-action {
+    border-radius: 6px;
+    padding: 5px 12px;
+}
