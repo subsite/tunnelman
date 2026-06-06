@@ -24,6 +24,11 @@ window {
 }
 
 /* Disable selection highlight */
+.profile-list row.drag-over {
+    background-color: #eef3fc;
+    box-shadow: inset 0 3px 0 #3584e4, 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+}
+
 .profile-list row:selected {
     background-color: white;
     color: inherit;
@@ -39,6 +44,17 @@ window {
     font-weight: 600;
     font-size: 14px;
     color: #1a1a1a;
+}
+
+/* Drag handle */
+.drag-handle {
+    color: #cccccc;
+    font-size: 14px;
+    padding: 0 8px 0 4px;
+}
+
+.drag-handle:hover {
+    color: #888888;
 }
 
 /* Status dot */
@@ -67,10 +83,31 @@ window {
     color: #424242;
 }
 
-/* Add button in header */
-headerbar button.suggested-action {
-    border-radius: 6px;
-    padding: 4px 10px;
+/* "New Profile" list row */
+.add-profile-row {
+    background-color: white;
+    border-radius: 8px;
+    margin: 3px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.add-profile-row button {
+    background: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 14px;
+    min-height: 0;
+    border-radius: 8px;
+}
+
+.add-profile-row button:hover {
+    background: rgba(0,0,0,0.04);
+    background-image: none;
+    color: #333333;
 }
 
 /* ── Edit dialog ─────────────────────────────── */
@@ -91,8 +128,27 @@ headerbar button.suggested-action {
 /* Tunnel TreeView wrapper */
 .tunnel-list-scroll {
     border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 6px;
+    border-radius: 6px 6px 0 0;
     background-color: white;
+}
+
+/* "New Tunnel" button row below the tunnel list */
+.tunnel-add-row {
+    background-color: white;
+    background-image: none;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 5px 8px;
+    color: #666666;
+    font-size: 13px;
+    box-shadow: none;
+}
+
+.tunnel-add-row:hover {
+    background-color: #f5f5f5;
+    background-image: none;
+    color: #333333;
 }
 
 /* TreeView column headers */

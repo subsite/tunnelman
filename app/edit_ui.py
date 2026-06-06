@@ -63,17 +63,12 @@ class EditProfile(Gtk.Dialog):
         hb.set_title(dialog_title)
         self.dialog.set_titlebar(hb)
 
-        self.profile_model['tunnels'].append(copy.deepcopy(utl.conf['default_tunnel']))
-
         for t in self.profile_model['tunnels']:
             tlist = [t[key] for key in self.tunnel_keys]
             tlist.append("#222222")
             self.tunnels_store.append(tlist)
 
-        # Gray out the placeholder row
-        self.tunnels_store[-1][4] = "gray"
-
-        for i, column_title in enumerate(["Port1", "Host", "Port2", "Comment"]):
+        for i, column_title in enumerate(["Local", "Host", "Remote", "Comment"]):
             renderer = Gtk.CellRendererText()
             renderer.set_property("editable", True)
             renderer.connect("editing-started", self.on_edit_tunnel_start, i)
@@ -85,8 +80,22 @@ class EditProfile(Gtk.Dialog):
             self.tunnels_list.append_column(column)
 
         self.tunnels_list.get_style_context().add_class("tunnel-list")
-        tunnels_container = builder.get_object("tunnels_list")
-        tunnels_container.add(self.tunnels_list)
+
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_min_content_height(100)
+        scroll.get_style_context().add_class("tunnel-list-scroll")
+        scroll.add(self.tunnels_list)
+        scroll.show_all()
+
+        add_btn = Gtk.Button(label="+ New Tunnel")
+        add_btn.get_style_context().add_class("tunnel-add-row")
+        add_btn.connect("clicked", self.add_tunnel)
+        add_btn.show()
+
+        tunnels_container = builder.get_object("tunnels_container")
+        tunnels_container.pack_start(scroll, True, True, 0)
+        tunnels_container.pack_start(add_btn, False, True, 0)
 
         self.dialog.show_all()
 
@@ -143,23 +152,23 @@ class EditProfile(Gtk.Dialog):
 
     def on_select_tunnel(self, selection):
         (model, paths) = selection.get_selected_rows()
-        if not paths:
-            return
-        index = paths[0].get_indices()[0]
-        # Disable delete for the placeholder row (always last)
-        is_placeholder = index == len(self.profile_model['tunnels']) - 1
-        self.del_button.set_sensitive(not is_placeholder)
+        self.del_button.set_sensitive(bool(paths))
 
     def on_del_tunnel(self, button):
         (model, paths) = self.selected_tunnel.get_selected_rows()
         if not paths:
             return
         index = paths[0].get_indices()[0]
-        if index == len(self.profile_model['tunnels']) - 1:
-            return
         iter = model.get_iter(paths[0])
         del self.profile_model['tunnels'][index]
         model.remove(iter)
+
+    def add_tunnel(self, button):
+        new_tunnel = copy.deepcopy(utl.conf['default_tunnel'])
+        self.profile_model['tunnels'].append(new_tunnel)
+        tlist = [new_tunnel[key] for key in self.tunnel_keys]
+        tlist.append("gray")
+        self.tunnels_store.append(tlist)
 
     def cancel(self, widget):
         self.profile_model = copy.deepcopy(self.original_model)

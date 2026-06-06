@@ -9,7 +9,8 @@
       "Bash(venv/bin/pip show *)",
       "Bash(./venv/bin/pip show *)",
       "Bash(pip show *)",
-      "Read(//usr/**)"
+      "Read(//usr/**)",
+      "Bash(xargs ls -la)"
     ]
   }
 }

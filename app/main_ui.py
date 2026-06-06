@@ -1,5 +1,7 @@
 
+import pathlib
 import threading
+import cairo
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
@@ -25,8 +27,17 @@ class MainUi(Gtk.Window):
         self._load_css()
         self._build_headerbar()
 
+        self._drag_row = None
+        self._drag_highlight_row = None
+        _drag_target = [Gtk.TargetEntry.new("GTK_LIST_BOX_ROW", Gtk.TargetFlags.SAME_APP, 0)]
+
         self.tunnel_listbox = builder.get_object("profiles")
         self.tunnel_listbox.get_style_context().add_class("profile-list")
+        self.tunnel_listbox.drag_dest_set(Gtk.DestDefaults.ALL, _drag_target, Gdk.DragAction.MOVE)
+        self.tunnel_listbox.connect("drag-motion", self._on_drag_motion)
+        self.tunnel_listbox.connect("drag-leave", self._on_drag_leave)
+        self.tunnel_listbox.connect("drag-data-received", self._on_drag_received)
+        self._drag_target = _drag_target
 
         self.create_list_items()
         self.window.show_all()
@@ -44,12 +55,6 @@ class MainUi(Gtk.Window):
         hb = Gtk.HeaderBar()
         hb.set_show_close_button(True)
         hb.set_title("TunnelMan")
-
-        add_btn = Gtk.Button.new_from_icon_name("list-add-symbolic", Gtk.IconSize.BUTTON)
-        add_btn.set_tooltip_text("Add profile")
-        add_btn.connect("clicked", self.on_add_profile_btn_clicked)
-        add_btn.get_style_context().add_class("suggested-action")
-        hb.pack_end(add_btn)
 
         about_btn = Gtk.Button.new_from_icon_name("help-about-symbolic", Gtk.IconSize.BUTTON)
         about_btn.set_tooltip_text("About TunnelMan")
@@ -86,6 +91,16 @@ class MainUi(Gtk.Window):
             hbox.get_style_context().add_class("profile-row")
             row.add(hbox)
 
+            # Drag handle
+            handle = Gtk.EventBox()
+            handle_label = Gtk.Label("⠿")
+            handle_label.get_style_context().add_class("drag-handle")
+            handle.add(handle_label)
+            handle.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, self._drag_target, Gdk.DragAction.MOVE)
+            handle.connect("drag-begin", lambda w, ctx, r=row: self._on_drag_begin(w, ctx, r))
+            handle.connect("drag-data-get", lambda w, ctx, d, i, t: d.set(d.get_target(), 8, b""))
+            hbox.pack_start(handle, False, False, 0)
+
             # Status dot
             dot = Gtk.Label("●")
             dot.get_style_context().add_class("status-dot")
@@ -121,7 +136,62 @@ class MainUi(Gtk.Window):
 
             self.tunnel_listbox.add(row)
 
+        # "New Profile" row — always last
+        add_row = Gtk.ListBoxRow()
+        add_row.get_style_context().add_class("add-profile-row")
+        add_btn = Gtk.Button(label="+ New Profile")
+        add_btn.connect("clicked", self.on_add_profile_btn_clicked)
+        add_row.add(add_btn)
+        self.tunnel_listbox.add(add_row)
+
         self.tunnel_listbox.show_all()
+
+    def _on_drag_begin(self, widget, context, row):
+        self._drag_row = row
+        alloc = row.get_allocation()
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, alloc.width, alloc.height)
+        cr = cairo.Context(surface)
+        cr.set_source_rgba(1, 1, 1, 0.85)
+        cr.rectangle(0, 0, alloc.width, alloc.height)
+        cr.fill()
+        row.draw(cr)
+        Gtk.drag_set_icon_surface(context, surface)
+
+    def _on_drag_motion(self, listbox, context, x, y, time):
+        target_row = listbox.get_row_at_y(y)
+        n = len(utl.conf['profiles'])
+        if self._drag_highlight_row:
+            self._drag_highlight_row.get_style_context().remove_class("drag-over")
+            self._drag_highlight_row = None
+        if target_row and target_row.get_index() < n:
+            target_row.get_style_context().add_class("drag-over")
+            self._drag_highlight_row = target_row
+        Gdk.drag_status(context, Gdk.DragAction.MOVE, time)
+        return True
+
+    def _on_drag_leave(self, listbox, context, time):
+        if self._drag_highlight_row:
+            self._drag_highlight_row.get_style_context().remove_class("drag-over")
+            self._drag_highlight_row = None
+
+    def _on_drag_received(self, listbox, context, x, y, data, info, time):
+        if self._drag_highlight_row:
+            self._drag_highlight_row.get_style_context().remove_class("drag-over")
+            self._drag_highlight_row = None
+        if self._drag_row is None:
+            Gtk.drag_finish(context, False, False, time)
+            return
+        src_idx = self._drag_row.get_index()
+        target_row = listbox.get_row_at_y(y)
+        n = len(utl.conf['profiles'])
+        dst_idx = min(target_row.get_index(), n - 1) if target_row else n - 1
+        if src_idx != dst_idx and 0 <= dst_idx < n:
+            p = utl.conf['profiles'].pop(src_idx)
+            utl.conf['profiles'].insert(dst_idx, p)
+            utl.save_profiles_conf()
+            self.create_list_items()
+        Gtk.drag_finish(context, True, False, time)
+        self._drag_row = None
 
     def _update_dot(self, dot, tunnel):
         ctx = dot.get_style_context()
@@ -218,7 +288,7 @@ class MainUi(Gtk.Window):
     def on_about_clicked(self, widget):
         dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)
         dialog.set_program_name("TunnelMan")
-        dialog.set_version("1.0")
+        dialog.set_version((pathlib.Path(__file__).parent.parent / "VERSION").read_text().strip())
         dialog.set_authors(["Fredrik Welander"])
         dialog.set_website("https://github.com/subsite/tunnelman")
         dialog.set_website_label("github.com/subsite/tunnelman")
