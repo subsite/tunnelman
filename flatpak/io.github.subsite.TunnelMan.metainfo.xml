@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.subsite.TunnelMan</id>
+  <name>TunnelMan</name>
+  <summary>SSH Tunnel Manager</summary>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <description>
+    <p>
+      TunnelMan lets you manage SSH tunnels with multiple port forwards per
+      profile. Profiles are saved locally and tunnels are opened with a single
+      toggle. Equivalent to running ssh -N -L ... on the command line, but with
+      a graphical interface.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Multiple port-forward rules per profile</li>
+      <li>Key-based authentication via ssh-agent</li>
+      <li>Interactive host-key verification on first connect</li>
+      <li>Per-profile keepalive settings</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.subsite.TunnelMan.desktop</launchable>
+
+  <url type="homepage">https://github.com/subsite/tunnelman</url>
+  <url type="bugtracker">https://github.com/subsite/tunnelman/issues</url>
+
+  <developer_name>Fredrik Welander</developer_name>
+
+  <provides>
+    <binary>tunnelman</binary>
+  </provides>
+
+  <releases>
+    <release version="1.0.0" date="2026-06-06">
+      <description>
+        <p>Initial release.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1"/>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window showing tunnel profiles</caption>
+      <image>https://subsite.github.io/tunnelman/screenshots/main_window.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Edit profile dialog</caption>
+      <image>https://subsite.github.io/tunnelman/screenshots/profile_window.png</image>
+    </screenshot>
+  </screenshots>
+</component>

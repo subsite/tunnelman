@@ -32,6 +32,21 @@ cd tunnelman
 
 No pip packages required. Tunnels are opened by shelling out to the system `ssh` binary, so all key types (Ed25519, ECDSA, RSA), `~/.ssh/config`, and SSH agent forwarding work automatically.
 
+### Building as Flatpak
+
+```bash
+# Install build tools (once)
+sudo apt install flatpak flatpak-builder
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub org.gnome.Platform//47 org.gnome.Sdk//47
+
+# Build and install locally
+flatpak-builder --install --user build-dir flatpak/io.github.subsite.TunnelMan.yml
+
+# Run
+flatpak run io.github.subsite.TunnelMan
+```
+
 ### Roadmap
 
 - Password prompt for connections without key-authentication

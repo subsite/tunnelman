@@ -231,18 +231,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkScrolledWindow" id="tunnels_list">
+              <object class="GtkBox" id="tunnels_container">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">never</property>
-                <property name="vscrollbar_policy">automatic</property>
-                <property name="min_content_height">130</property>
-                <style>
-                  <class name="tunnel-list-scroll"/>
-                </style>
-                <child>
-                  <placeholder/>
-                </child>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">0</property>
               </object>
               <packing>
                 <property name="expand">True</property>

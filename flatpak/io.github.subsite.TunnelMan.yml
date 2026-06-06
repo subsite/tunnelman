@@ -1,0 +1,69 @@
+app-id: io.github.subsite.TunnelMan
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+command: tunnelman
+
+finish-args:
+  # Network access for SSH connections
+  - --share=network
+  # SSH agent socket (key authentication via ssh-agent)
+  - --socket=ssh-auth
+  # Read/write ~/.ssh for known_hosts updates (accept-new host keys)
+  - --filesystem=home/.ssh:rw
+  # App config directory
+  - --filesystem=xdg-config/tunnelman:rw
+
+modules:
+
+  # ── OpenSSH client ────────────────────────────────────────────────
+  # Bundled because the sandbox can't see the host /usr/bin/ssh.
+  # Only the client-side binaries are kept; sshd is removed.
+  - name: openssh
+    buildsystem: autotools
+    config-opts:
+      - --sysconfdir=/app/etc/ssh
+      - --with-privsep-path=/var/empty
+      - --without-pam
+      - --without-selinux
+      - --without-kerberos5
+      - --without-ldns
+      - --without-libedit
+    post-install:
+      - rm -f /app/sbin/sshd
+      - rm -f /app/libexec/sshd
+    sources:
+      - type: archive
+        url: https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.7p1.tar.gz
+        sha256: 490426f766d82a2763fcacd8d83ea3d70798750c7bd2aff2e57dc5660f773ffd
+
+  # ── TunnelMan ─────────────────────────────────────────────────────
+  - name: tunnelman
+    buildsystem: simple
+    build-commands:
+      # App source
+      - install -Dm644 VERSION                /app/share/tunnelman/VERSION
+      - install -Dm755 tunnelman.py          /app/share/tunnelman/tunnelman.py
+      - install -Dm644 app/__init__.py       /app/share/tunnelman/app/__init__.py
+      - install -Dm644 app/util.py           /app/share/tunnelman/app/util.py
+      - install -Dm644 app/tunnel.py         /app/share/tunnelman/app/tunnel.py
+      - install -Dm644 app/main_ui.py        /app/share/tunnelman/app/main_ui.py
+      - install -Dm644 app/edit_ui.py        /app/share/tunnelman/app/edit_ui.py
+      # Assets
+      - install -Dm644 assets/style.css      /app/share/tunnelman/assets/style.css
+      - install -Dm644 assets/img/icon.png   /app/share/tunnelman/assets/img/icon.png
+      - install -Dm644 assets/glade/main_ui.glade         /app/share/tunnelman/assets/glade/main_ui.glade
+      - install -Dm644 assets/glade/edit_profile.glade    /app/share/tunnelman/assets/glade/edit_profile.glade
+      - install -Dm644 assets/glade/confirm_delete.glade  /app/share/tunnelman/assets/glade/confirm_delete.glade
+      # Launcher wrapper
+      - install -Dm755 flatpak/tunnelman.sh  /app/bin/tunnelman
+      # Desktop integration
+      - install -Dm644 flatpak/io.github.subsite.TunnelMan.desktop
+          /app/share/applications/io.github.subsite.TunnelMan.desktop
+      - install -Dm644 flatpak/io.github.subsite.TunnelMan.metainfo.xml
+          /app/share/metainfo/io.github.subsite.TunnelMan.metainfo.xml
+      - install -Dm644 assets/img/icon.png
+          /app/share/icons/hicolor/256x256/apps/io.github.subsite.TunnelMan.png
+    sources:
+      - type: dir
+        path: ..

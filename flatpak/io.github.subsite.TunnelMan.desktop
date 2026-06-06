@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=TunnelMan
+Comment=SSH Tunnel Manager
+Exec=tunnelman
+Icon=io.github.subsite.TunnelMan
+Terminal=false
+Type=Application
+Categories=Network;RemoteAccess;
+Keywords=ssh;tunnel;port;forward;
