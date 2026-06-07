@@ -19,12 +19,18 @@ jobs:
 
       - name: Ensure metainfo has a release entry for this version
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          DATE=$(date +%Y-%m-%d)
-          METAINFO="flatpak/io.github.subsite.TunnelMan.metainfo.xml"
-          if ! grep -q "version=\"$VERSION\"" "$METAINFO"; then
-            sed -i "s|<releases>|<releases>\n    <release version=\"$VERSION\" date=\"$DATE\"/>|" "$METAINFO"
-          fi
+          python3 - <<'EOF'
+          import os
+          from datetime import date
+          version = os.environ['GITHUB_REF_NAME'].lstrip('v')
+          today = date.today().isoformat()
+          path = 'flatpak/io.github.subsite.TunnelMan.metainfo.xml'
+          content = open(path).read()
+          if f'version="{version}"' not in content:
+              entry = f'\n    <release version="{version}" date="{today}"/>'
+              content = content.replace('<releases>', '<releases>' + entry, 1)
+              open(path, 'w').write(content)
+          EOF
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
