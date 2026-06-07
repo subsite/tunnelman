@@ -1,0 +1,13 @@
+#!/bin/sh
+# Auto-tag locally when VERSION changes in a commit.
+CHANGED=$(git diff-tree --no-commit-id -r --name-only HEAD)
+if echo "$CHANGED" | grep -q '^VERSION$'; then
+    VERSION=$(cat VERSION)
+    TAG="v$VERSION"
+    if git rev-parse "$TAG" >/dev/null 2>&1; then
+        echo "Tag $TAG already exists, skipping auto-tag."
+    else
+        git tag "$TAG"
+        echo "Tagged $TAG — push with: git push origin master --tags"
+    fi
+fi
