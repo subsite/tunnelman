@@ -5,6 +5,10 @@ sdk: org.gnome.Sdk
 command: tunnelman
 
 finish-args:
+  # Display
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
   # Network access for SSH connections
   - --share=network
   # SSH agent socket (key authentication via ssh-agent)

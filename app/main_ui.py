@@ -46,7 +46,7 @@ class MainUi(Gtk.Window):
         css = Gtk.CssProvider()
         css.load_from_path("{}/assets/style.css".format(utl.conf['base_path']))
         Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(),
+            self.window.get_screen(),
             css,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
