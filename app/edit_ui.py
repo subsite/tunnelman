@@ -9,10 +9,11 @@ from app.util import utl
 
 class EditProfile(Gtk.Dialog):
 
-    def __init__(self, parent, profile_index):
+    def __init__(self, parent, profile_index, read_only=False):
 
         self.parent = parent
         self.profile_index = profile_index
+        self.read_only = read_only
 
         if self.profile_index is None:
             self.profile_model = copy.deepcopy(utl.conf['default_profile'])
@@ -23,6 +24,8 @@ class EditProfile(Gtk.Dialog):
 
         if profile_index is None:
             dialog_title = "Add Profile"
+        elif read_only:
+            dialog_title = "View Profile {}".format(self.profile_model['name'])
         else:
             dialog_title = "Edit Profile {}".format(self.profile_model['name'])
 
@@ -46,6 +49,8 @@ class EditProfile(Gtk.Dialog):
             if builder.get_object(fld):
                 self.fields[fld] = builder.get_object(fld)
                 self.fields[fld].set_text(str(self.profile_model[fld]))
+                if read_only:
+                    self.fields[fld].set_sensitive(False)
 
         # Tunnels list
         self.tunnel_keys = ["port1", "host", "port2", "comment"]
@@ -57,6 +62,9 @@ class EditProfile(Gtk.Dialog):
         self.save_button = builder.get_object("save_profile")
         self.save_button.get_style_context().add_class("suggested-action")
         self.del_button.get_style_context().add_class("destructive-action")
+        if read_only:
+            self.save_button.set_sensitive(False)
+            self.del_button.set_sensitive(False)
 
         hb = Gtk.HeaderBar()
         hb.set_show_close_button(False)
@@ -70,10 +78,11 @@ class EditProfile(Gtk.Dialog):
 
         for i, column_title in enumerate(["Local", "Host", "Remote", "Comment"]):
             renderer = Gtk.CellRendererText()
-            renderer.set_property("editable", True)
-            renderer.connect("editing-started", self.on_edit_tunnel_start, i)
-            renderer.connect("editing-canceled", self.on_edit_tunnel_cancel)
-            renderer.connect("edited", self.on_edit_tunnel_finish, i)
+            renderer.set_property("editable", not read_only)
+            if not read_only:
+                renderer.connect("editing-started", self.on_edit_tunnel_start, i)
+                renderer.connect("editing-canceled", self.on_edit_tunnel_cancel)
+                renderer.connect("edited", self.on_edit_tunnel_finish, i)
             column = Gtk.TreeViewColumn(column_title, renderer, text=i, foreground=4)
             if column_title == "Comment":
                 column.set_expand(True)
@@ -91,6 +100,7 @@ class EditProfile(Gtk.Dialog):
         add_btn = Gtk.Button(label="+ New Tunnel")
         add_btn.get_style_context().add_class("tunnel-add-row")
         add_btn.connect("clicked", self.add_tunnel)
+        add_btn.set_sensitive(not read_only)
         add_btn.show()
 
         tunnels_container = builder.get_object("tunnels_container")
@@ -152,7 +162,7 @@ class EditProfile(Gtk.Dialog):
 
     def on_select_tunnel(self, selection):
         (model, paths) = selection.get_selected_rows()
-        self.del_button.set_sensitive(bool(paths))
+        self.del_button.set_sensitive(bool(paths) and not self.read_only)
 
     def on_del_tunnel(self, button):
         (model, paths) = self.selected_tunnel.get_selected_rows()

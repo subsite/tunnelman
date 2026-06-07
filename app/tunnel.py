@@ -47,6 +47,7 @@ class Tunnel:
         return cmd
 
     def open_tunnel(self, trust_new_host=False):
+        self.profile = next(p for p in utl.conf['profiles'] if p['id'] == self.profile_id)
         utl.log(f"[{self.profile['name']}] Connecting to {self.profile['server']}...")
         try:
             self._process = subprocess.Popen(

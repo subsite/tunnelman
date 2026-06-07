@@ -83,6 +83,10 @@ window {
     color: #424242;
 }
 
+.profile-list button.flat:disabled {
+    color: #cccccc;
+}
+
 /* "New Profile" list row */
 .add-profile-row {
     background-color: white;

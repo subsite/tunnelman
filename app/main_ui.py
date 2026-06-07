@@ -117,12 +117,13 @@ class MainUi(Gtk.Window):
             edit_btn = Gtk.Button.new_from_icon_name("document-edit-symbolic", Gtk.IconSize.BUTTON)
             edit_btn.set_tooltip_text("Edit profile")
             edit_btn.get_style_context().add_class("flat")
-            edit_btn.connect("clicked", self.on_edit_profile_btn_clicked, pid)
+            edit_btn.connect("clicked", self.on_edit_profile_btn_clicked, pid, tunnel.is_open)
             hbox.pack_start(edit_btn, False, False, 0)
 
             # Delete button
             delete_btn = Gtk.Button.new_from_icon_name("edit-delete-symbolic", Gtk.IconSize.BUTTON)
             delete_btn.set_tooltip_text("Delete profile")
+            delete_btn.set_sensitive(not tunnel.is_open)
             delete_btn.get_style_context().add_class("flat")
             delete_btn.connect("clicked", self.on_delete_profile_btn_clicked, pid)
             hbox.pack_start(delete_btn, False, False, 0)
@@ -226,7 +227,7 @@ class MainUi(Gtk.Window):
             def on_connect_done(result):
                 switch.set_sensitive(True)
                 if result is True:
-                    self._update_dot(dot, tunnel)
+                    self.create_list_items()
                 elif isinstance(result, HostKeyError):
                     if self._confirm_host_key(str(result)):
                         switch.set_sensitive(False)
@@ -255,7 +256,7 @@ class MainUi(Gtk.Window):
                 return
             if tunnel.is_open:
                 tunnel.close_tunnel()
-            self._update_dot(dot, tunnel)
+            self.create_list_items()
 
     def _confirm_host_key(self, stderr):
         lines = [l for l in stderr.splitlines()
@@ -309,14 +310,14 @@ class MainUi(Gtk.Window):
     def on_add_profile_btn_clicked(self, widget):
         self.on_edit_profile_btn_clicked(widget, None)
 
-    def on_edit_profile_btn_clicked(self, widget, profile_id):
+    def on_edit_profile_btn_clicked(self, widget, profile_id, read_only=False):
         if profile_id is None:
             profile_index = None
         else:
             ids = [p['id'] for p in utl.conf['profiles']]
             profile_index = ids.index(profile_id) if profile_id in ids else None
 
-        dialog = EditProfile(self.window, profile_index).dialog
+        dialog = EditProfile(self.window, profile_index, read_only=read_only).dialog
         dialog.run()
         dialog.close()
         self.create_list_items()
