@@ -62,9 +62,10 @@ Please report issues to the issue tracker.
 
 ### Notes for developers
 
-**One-time setup** — tell git to use the repo's hook directory:
+**One-time setup** — tell git to use the repo's hook directory and push tags with commits:
 ```bash
 git config core.hooksPath .githooks
+git config push.followTags true
 ```
 
 **Releasing a new version:**
@@ -72,6 +73,6 @@ git config core.hooksPath .githooks
 1. Edit `VERSION` (e.g. `1.0.0` → `1.1.0`)
 2. Add a `<release>` entry in `flatpak/io.github.subsite.TunnelMan.metainfo.xml`
 3. Commit: `git commit -am "release 1.1.0"` — the post-commit hook auto-creates the `v1.1.0` tag
-4. Push: `git push origin master --tags`
+4. Push: `git push origin master`
 
 GitHub Actions picks up the tag, builds the `.flatpak` bundle, and publishes a GitHub release automatically.

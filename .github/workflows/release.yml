@@ -15,12 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Patch metainfo version and date from tag
+      - name: Ensure metainfo has a release entry for this version
         run: |
           VERSION=${GITHUB_REF_NAME#v}
           DATE=$(date +%Y-%m-%d)
-          sed -i "s|<release version=\"[^\"]*\" date=\"[^\"]*\">|<release version=\"$VERSION\" date=\"$DATE\">|" \
-            flatpak/io.github.subsite.TunnelMan.metainfo.xml
+          METAINFO="flatpak/io.github.subsite.TunnelMan.metainfo.xml"
+          if ! grep -q "version=\"$VERSION\"" "$METAINFO"; then
+            sed -i "s|<releases>|<releases>\n    <release version=\"$VERSION\" date=\"$DATE\"/>|" "$METAINFO"
+          fi
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
